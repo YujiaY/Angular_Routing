@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {Router} from "@angular/router";
+import {AuthService} from "../auth-service";
 
 @Component({
   selector: 'app-home',
@@ -7,15 +8,32 @@ import {Router} from "@angular/router";
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
+   // loginStatus = new EventEmitter<boolean>();
+  isLogin;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router,
+              private authService: AuthService) { }
 
   ngOnInit() {
+    this.isLogin = this.authService.loggedIn;
   }
-  onLoadServers() {
+  onLoadServer(id: number) {
     //complex calculation
-    this.router.navigate(['/servers']);
+    this.router.navigate(
+      ['/servers', id, 'edit'],
+      {queryParams: {allowEdit: '1'}
+      ,fragment: 'loading'}
+      );
 
   }
-
+  onLogin() {
+    this.authService.login();
+    this.isLogin = true;
+    // this.loginStatus.emit(this.isLogin);
+  }
+  onLogout() {
+    this.authService.logout();
+    this.isLogin = false;
+    // this.loginStatus.emit(this.isLogin);
+  }
 }
